@@ -1,0 +1,57 @@
+// EDUHub - Next.js API route for live NKP PDF content (minden tankönyv, 5. osztályosok prioritással)
+// File: /pages/api/tankonyvek.js
+
+import fetch from 'node-fetch';
+
+// Lista az összes NKP PDF URL-ről és metaadatokról
+// (Cím, típus, évfolyam, URL)
+const nkpResources = [
+  // 5. osztályos tankönyvek - prioritás
+  { id: 1, title: "Magyar nyelv - 5. évfolyam", type: "tankonyv", grade: 5, url: "https://www.nkp.hu/api/media/file/5oszt_mny.pdf" },
+  { id: 2, title: "Matematika - 5. évfolyam", type: "tankonyv", grade: 5, url: "https://www.nkp.hu/api/media/file/5oszt_matek.pdf" },
+  { id: 3, title: "Történelem - 5. évfolyam", type: "tankonyv", grade: 5, url: "https://www.nkp.hu/api/media/file/5oszt_tortenelem.pdf" },
+
+  // 6. osztályos tankönyvek
+  { id: 4, title: "Magyar nyelv - 6. évfolyam", type: "tankonyv", grade: 6, url: "https://www.nkp.hu/api/media/file/6oszt_mny.pdf" },
+  { id: 5, title: "Matematika - 6. évfolyam", type: "tankonyv", grade: 6, url: "https://www.nkp.hu/api/media/file/6oszt_matek.pdf" },
+
+  // 7. osztályos tankönyvek
+  { id: 6, title: "Magyar nyelv - 7. évfolyam", type: "tankonyv", grade: 7, url: "https://www.nkp.hu/api/media/file/7oszt_mny.pdf" },
+  { id: 7, title: "Matematika - 7. évfolyam", type: "tankonyv", grade: 7, url: "https://www.nkp.hu/api/media/file/7oszt_matek.pdf" }
+  // Ide jöhet az összes további tankönyv az NKP-ről
+];
+
+// Cache változó az egyszerű gyorsítótárhoz
+let cache = {
+  data: null,
+  timestamp: 0
+};
+
+const CACHE_TTL = 1000 * 60 * 60; // 1 óra
+
+export default async function handler(req, res) {
+  const now = Date.now();
+
+  // Ha van cache és friss, visszaadjuk
+  if (cache.data && now - cache.timestamp < CACHE_TTL) {
+    return res.status(200).json(cache.data);
+  }
+
+  try {
+    // A legfontosabbak: 5. osztályos tankönyvek kerüljenek előre
+    const sortedData = nkpResources.sort((a, b) => {
+      if (a.grade === 5 && b.grade !== 5) return -1;
+      if (b.grade === 5 && a.grade !== 5) return 1;
+      return 0;
+    });
+
+    // Cache frissítése
+    cache.data = sortedData;
+    cache.timestamp = now;
+
+    res.status(200).json(sortedData);
+  } catch (error) {
+    console.error('Hiba az NKP adatok lekérésekor:', error);
+    res.status(500).json({ error: 'Hiba az NKP adatok lekérésekor' });
+  }
+}
