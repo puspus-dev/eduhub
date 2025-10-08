@@ -1,7 +1,26 @@
-# EDUhub
+# 🎓 EDUHub — Digitális Oktatási Portál
 
-nkp.hu-ra alapult Nemzeti Köznevelési Portál
+Egy modern, reszponzív oktatási webalkalmazás, amely az NKP inspirációjára készült — modern felhasználói élménnyel, animációkkal és egyszerű bővíthetőséggel.
 
-A projekt még fejlesztés alatt áll!
+## 🚀 Tech stack
 
-ExtenderTeam - 2025; EDUhub Portál
+- ⚛️ **React 18**
+- ⚡ **Vite**
+- 🎨 **TailwindCSS**
+- 🌀 **Framer Motion**
+- 🧩 **Lucide React Icons**
+- ☁️ **Vercel** (hosting)
+
+---
+
+## 📦 Telepítés lokálisan
+
+1. Klónozd le a repót:
+
+   ```bash
+   git clone https://github.com/puspus-dev/eduhub.git
+   cd eduhub
+
+Ez az egész az nkp.hu-ra épült!
+
+ExtenderTeam 2025 - EDUhub Portál
