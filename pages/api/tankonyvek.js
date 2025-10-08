@@ -1,43 +1,34 @@
-// EDUHub - Next.js API route for live NKP PDF content
-// File: /pages/api/tankonyvek.js
 
-import fetch from 'node-fetch';
-
-// Előre definiált lista az NKP PDF URL-ekről és metaadatokról
+// Lista az összes NKP PDF URL-ről és metaadatokról
 const nkpResources = [
-  { id: 1, title: "Magyar nyelv - 7. évfolyam", type: "tankonyv", grade: 7, url: "https://www.nkp.hu/api/media/file/b07b4817b137734aaafd720fd813c1d432af519f" },
-  { id: 2, title: "Matematika: Algebra feladatok", type: "feladat", grade: 8, url: "https://www.nkp.hu/api/media/file/5613c98675d9c07ccd556dc9e0d1cd26e6ed8bcf" },
-  { id: 3, title: "Történelem: Az őskor", type: "videó", grade: 6, url: "https://www.nkp.hu/api/media/file/9a2e11c3c4e6f7a1f0e1ab2cd53b7f1f" }
+  { id: 1, title: "Magyar nyelv - 5. évfolyam", type: "tankonyv", grade: 5, url: "https://www.nkp.hu/api/media/file/5oszt_mny.pdf" },
+  { id: 2, title: "Matematika - 5. évfolyam", type: "tankonyv", grade: 5, url: "https://www.nkp.hu/api/media/file/5oszt_matek.pdf" },
+  { id: 3, title: "Történelem - 5. évfolyam", type: "tankonyv", grade: 5, url: "https://www.nkp.hu/api/media/file/5oszt_tortenelem.pdf" },
+  { id: 4, title: "Magyar nyelv - 6. évfolyam", type: "tankonyv", grade: 6, url: "https://www.nkp.hu/api/media/file/6oszt_mny.pdf" },
+  { id: 5, title: "Matematika - 6. évfolyam", type: "tankonyv", grade: 6, url: "https://www.nkp.hu/api/media/file/6oszt_matek.pdf" },
+  { id: 6, title: "Magyar nyelv - 7. évfolyam", type: "tankonyv", grade: 7, url: "https://www.nkp.hu/api/media/file/7oszt_mny.pdf" },
+  { id: 7, title: "Matematika - 7. évfolyam", type: "tankonyv", grade: 7, url: "https://www.nkp.hu/api/media/file/7oszt_matek.pdf" }
 ];
 
-// Cache változó az egyszerű gyorsítótárhoz
-let cache = {
-  data: null,
-  timestamp: 0
-};
-
+let cache = { data: null, timestamp: 0 };
 const CACHE_TTL = 1000 * 60 * 60; // 1 óra
 
-export default async function handler(req, res) {
+export default function handler(req, res) {
   const now = Date.now();
 
-  // Ha van cache és friss, visszaadjuk
   if (cache.data && now - cache.timestamp < CACHE_TTL) {
     return res.status(200).json(cache.data);
   }
 
-  try {
-    // Itt lehetőség van az NKP URL ellenőrzésére vagy HEAD request-re,
-    // de mivel közvetlen linkek, egyszerűen visszaadjuk a JSON-t.
-    const data = nkpResources;
+  // 5. osztályos tankönyvek előre
+  const sortedData = nkpResources.sort((a, b) => {
+    if (a.grade === 5 && b.grade !== 5) return -1;
+    if (b.grade === 5 && a.grade !== 5) return 1;
+    return 0;
+  });
 
-    // Cache frissítése
-    cache.data = data;
-    cache.timestamp = now;
+  cache.data = sortedData;
+  cache.timestamp = now;
 
-    res.status(200).json(data);
-  } catch (error) {
-    console.error('Hiba az NKP adatok lekérésekor:', error);
-    res.status(500).json({ error: 'Hiba az NKP adatok lekérésekor' });
-  }
+  res.status(200).json(sortedData);
 }
